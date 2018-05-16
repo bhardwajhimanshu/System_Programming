@@ -2,29 +2,31 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<fcntl.h>
-#include<sys/msg.h>
+#include<sys/ipc.h>
+#include<sys/types.h>
+#include<sys/stat.h>
 
 
-typedef struct buf
-{
-	long int type;
-	char data[100];
-}buf;
 int main()
 {
-	buf b;
-	int msgid,msgid1;
-		
-	msgid=msgget((key_t)222,0666|IPC_CREAT);
-	msgid1=msgget((key_t)111,0666|IPC_CREAT);
+	int wfd,rfd;
+	mkfifo("myfifo",0666|IPC_CREAT);
+//	mkfifo("myfifo1",0666|IPC_CREAT);
+	wfd=open("myfifo",O_WRONLY);
+	rfd=open("myfifo",O_RDONLY);
+	char buff[100];
+//	char buff1[100];
+	printf("\t Chat Application \n");
+	printf("\t Writer\n");
 	while(1)
 	{
-		b.type=getpid();
-		printf("[User1]:");
-		fgets(b.data,sizeof(buf),stdin);
-		msgsnd(msgid,&b,sizeof(b),0);
-		msgrcv(msgid1,&b,sizeof(b),b.type,0);
-		printf("[User1] : %s",b.data);
+		printf("[USER 1] Waiting for typing:");
+		fgets(buff,sizeof(buff),stdin);
+		write(wfd,buff,sizeof(buff));
+		printf("[USER 1] Waiting for reply:\n");
+		read(rfd,buff,sizeof(buff));
+		printf("[USER 2] %s",buff);
+	//	close(wfd);
 	}
 
 }
