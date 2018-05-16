@@ -2,27 +2,27 @@
 #include<stdlib.h>
 #include<unistd.h>
 #include<fcntl.h>
-#include<sys/shm.h>
-#include<string.h>
+#include<sys/msg.h>
 
+
+typedef struct buf
+{
+	long int type;
+	char data[100];
+}buf;
 int main()
 {
-	void *buff = (void*)0;
-	int shmid,shmid1;
-	char *buff1;
-	char *buff2;
-	shmid=shmget((key_t)222,1024,0666|IPC_CREAT);
-	shmid1=shmget((key_t)111,1024,0666|IPC_CREAT);
-	buff1= (char*) shmat(shmid,(void*)0,0);
-	buff2= (char*) shmat(shmid1,(void*)0,0);
+	buf b;
+	int msgid,msgid1;
+	msgid=msgget((key_t)222,0666|IPC_CREAT);
+	msgid1=msgget((key_t)111,0666|IPC_CREAT);
 	while(1)
 	{
-	//strcpy(buff1,buff);
-	printf("%s",buff1);
+	msgrcv(msgid,&b,sizeof(b),0,0);
+	printf("[User2]:%s",b.data);
 	printf("[User2]:");
-	fgets(buff2,sizeof(buff2),stdin);
+	fgets(b.data,sizeof(b),stdin);
+	msgsnd(msgid1,&b,sizeof(b),0);
 	}
-
-
 
 }
