@@ -5,6 +5,7 @@
 
 int main()
 {
+	printf("%s: End\n"__FILE__);
 	printf("%s:Begin:file %d:pid\n",__FILE__,getpid());
 
 	execl("./hii","Himanshu","Nitesh","Shivam",NULL);
